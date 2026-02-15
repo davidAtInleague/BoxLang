@@ -1452,3 +1452,20 @@ task getDependencies( type: Copy ) {
   from sourceSets.main.runtimeClasspath
   into 'build/dependencies/'
 }
+
+// explicitly specify sourceSets for vscode intellisense
+sourceSets {
+    main {
+        java {
+            srcDirs = [
+				'src/main/java',
+				'build/generated-src/antlr/main',
+			]
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
+}

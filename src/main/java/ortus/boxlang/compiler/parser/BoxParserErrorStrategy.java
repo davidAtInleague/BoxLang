@@ -201,7 +201,7 @@ public class BoxParserErrorStrategy extends ParserErrorStrategy {
 																			put( "structExpression", "struct expression" );
 																			put( "new", "new statement" );
 																			put( "expression", "expression" );
-																			put( "el2", "expression" );
+																			put( "el2_2", "expression" );
 																			put( "anonymousFunction", "lambda or closure function" );
 																		}
 																	};

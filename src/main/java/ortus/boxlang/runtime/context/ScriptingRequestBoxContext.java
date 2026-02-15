@@ -50,23 +50,33 @@ public class ScriptingRequestBoxContext extends RequestBoxContext {
 	 * --------------------------------------------------------------------------
 	 */
 
-	private static BoxRuntime	runtime			= BoxRuntime.getInstance();
+	private static BoxRuntime	runtime					= BoxRuntime.getInstance();
 
 	/**
 	 * The variables scope
 	 */
-	protected IScope			variablesScope	= new VariablesScope();
+	protected IScope			variablesScope			= new VariablesScope();
 
 	/**
 	 * The request scope
 	 */
-	protected IScope			requestScope	= new RequestScope();
+	protected IScope			requestScope			= new RequestScope();
 
 	/**
 	 * The tied session ID to this context of execution, if any.
 	 * By default we default a random key GUID
 	 */
-	private Key					sessionID		= new Key( UUID.randomUUID().toString() );
+	private Key					sessionID				= new Key( UUID.randomUUID().toString() );
+
+	private PipePlaceholder		currentPipePlaceholder	= null;
+
+	public PipePlaceholder getCurrentPipePlaceholder() {
+		return this.currentPipePlaceholder;
+	}
+
+	public void setCurrentPipePlaceholder( PipePlaceholder v ) {
+		this.currentPipePlaceholder = v;
+	}
 
 	/**
 	 * --------------------------------------------------------------------------

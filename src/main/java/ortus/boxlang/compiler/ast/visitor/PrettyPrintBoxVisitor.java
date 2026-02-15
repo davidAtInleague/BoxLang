@@ -51,6 +51,7 @@ import ortus.boxlang.compiler.ast.expression.BoxMethodInvocation;
 import ortus.boxlang.compiler.ast.expression.BoxNegateOperation;
 import ortus.boxlang.compiler.ast.expression.BoxNew;
 import ortus.boxlang.compiler.ast.expression.BoxNull;
+import ortus.boxlang.compiler.ast.expression.BoxPipePlaceholder;
 import ortus.boxlang.compiler.ast.expression.BoxParenthesis;
 import ortus.boxlang.compiler.ast.expression.BoxScope;
 import ortus.boxlang.compiler.ast.expression.BoxStaticAccess;
@@ -841,6 +842,12 @@ public class PrettyPrintBoxVisitor extends VoidBoxVisitor {
 		print( "(" );
 		node.getExpression().accept( this );
 		print( ")" );
+		printPostComments( node );
+	}
+
+	public void visit( BoxPipePlaceholder node ) {
+		printPreComments( node );
+		print( "%" );
 		printPostComments( node );
 	}
 

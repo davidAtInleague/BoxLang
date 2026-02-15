@@ -437,7 +437,7 @@ fqn: (identifier DOT)* identifier
 
 expressionStatement
     : anonymousFunction # exprStatAnonymousFunction // function() {} or () => {} or () -> {}
-    | el2               # exprStatInvocable
+    | el2_1             # exprStatInvocable
     ;
 
 // This is used to allow for headless access to a component, such as .foo.bar.baz, which is not allowed
@@ -446,9 +446,15 @@ expressionStatement
 // which will allow .bar = baz to be a separate statement and think param foo is a component
 expression
     : anonymousFunction                             # exprAnonymousFunction // function() {} or () => {} or () -> {}
-    | el2                                           # invocable
+    | el2_1                                         # invocable
     | DOT identifier (LPAREN argumentList? RPAREN)? # exprHeadless
     ;
+
+el2_1
+    : head=el2_2 pipes+=pipeRest* # exprPipe // e1 (|> e2 |> ...)?
+    ;
+
+pipeRest : (PIPEOP expr=el2_2);
 
 // Universal expression rule. This is the top level rule for all expressions. It's left recursive, covers
 // precedence, implements precedence climbing, and handles all other expressions. This is the only rule needed for
@@ -460,50 +466,50 @@ expression
 // that yacc/bison process.
 //
 // Note the use of labels allows our visitor to know what it is visiting without complicated token checking etc
-el2
+el2_2
     : ILLEGAL_IDENTIFIER                                                    # exprIllegalIdentifier // 50foo
     | LPAREN expression RPAREN                                              # exprPrecedence        // ( foo )
     | new                                                                   # exprNew               // new foo.bar.Baz()
-    | el2 LPAREN argumentList? RPAREN                                       # exprFunctionCall      // foo(bar, baz)
-    | el2 (QM? DOT | COLONCOLON) el2                                        # exprDotOrColonAccess  // xc.y?.z or foo::bar recursive and Adobe's stupid foo..bar bug they allow
-    | el2 QM? DOT_FLOAT_LITERAL                                             # exprDotFloat          // foo.50
-    | el2 QM? DOT_NUMBER_PREFIXED_IDENTIFIER                                # exprDotFloatID        // foo.50bar
-    | el2 LBRACKET expression RBRACKET                                      # exprArrayAccess       // foo[bar]
-    | <assoc = right> op = (NOT | BANG | MINUS | PLUS) el2                  # exprUnary             //  !foo, -foo, +foo
-    | <assoc = right> op = (PLUSPLUS | MINUSMINUS | BITWISE_COMPLEMENT) el2 # exprPrefix            // ++foo, --foo, ~foo
-    | el2 op = (PLUSPLUS | MINUSMINUS)                                      # exprPostfix           // foo++, bar--
-    | el2 POWER el2                                                         # exprPower             // foo ^ bar
-    | el2 op = (STAR | SLASH | PERCENT | MOD | BACKSLASH) el2               # exprMult              // foo * bar
-    | el2 op = (PLUS | MINUS) el2                                           # exprAdd               // foo + bar
-    | el2 op = (
+    | el2_2 LPAREN argumentList? RPAREN                                     # exprFunctionCall      // foo(bar, baz)
+    | el2_2 (QM? DOT | COLONCOLON) el2_2                                    # exprDotOrColonAccess  // xc.y?.z or foo::bar recursive and Adobe's stupid foo..bar bug they allow
+    | el2_2 QM? DOT_FLOAT_LITERAL                                             # exprDotFloat          // foo.50
+    | el2_2 QM? DOT_NUMBER_PREFIXED_IDENTIFIER                                # exprDotFloatID        // foo.50bar
+    | el2_2 LBRACKET expression RBRACKET                                      # exprArrayAccess       // foo[bar]
+    | <assoc = right> op = (NOT | BANG | MINUS | PLUS) el2_2                  # exprUnary             //  !foo, -foo, +foo
+    | <assoc = right> op = (PLUSPLUS | MINUSMINUS | BITWISE_COMPLEMENT) el2_2 # exprPrefix            // ++foo, --foo, ~foo
+    | el2_2 op = (PLUSPLUS | MINUSMINUS)                                      # exprPostfix           // foo++, bar--
+    | el2_2 POWER el2_2                                                         # exprPower             // foo ^ bar
+    | el2_2 op = (STAR | SLASH | PERCENT | MOD | BACKSLASH) el2_2               # exprMult              // foo * bar
+    | el2_2 op = (PLUS | MINUS) el2_2                                           # exprAdd               // foo + bar
+    | el2_2 op = (
         BITWISE_SIGNED_LEFT_SHIFT
         | BITWISE_SIGNED_RIGHT_SHIFT
         | BITWISE_UNSIGNED_RIGHT_SHIFT
-    ) el2                 # exprBitShift   // foo b<< bar
-    | el2 BITWISE_AND el2 # exprBAnd       // foo b& bar
-    | el2 BITWISE_XOR el2 # exprBXor       // foo b^ bar
-    | el2 BITWISE_OR el2  # exprBor        // foo |b bar
-    | el2 XOR el2         # exprXor        // foo XOR bar
-    | el2 INSTANCEOF el2  # exprInstanceOf // InstanceOf operator
-    | el2 AMPERSAND el2   # exprCat        // foo & bar - string concatenation
+    ) el2_2                 # exprBitShift   // foo b<< bar
+    | el2_2 BITWISE_AND el2_2 # exprBAnd       // foo b& bar
+    | el2_2 BITWISE_XOR el2_2 # exprBXor       // foo b^ bar
+    | el2_2 BITWISE_OR el2_2  # exprBor        // foo |b bar
+    | el2_2 XOR el2_2         # exprXor        // foo XOR bar
+    | el2_2 INSTANCEOF el2_2  # exprInstanceOf // InstanceOf operator
+    | el2_2 AMPERSAND el2_2   # exprCat        // foo & bar - string concatenation
     // TODO: Maybe need to merge these three sets of ops as they are all given equal precedence in the original grammar
-    | el2 binOps el2                   # exprBinary      // foo eqv bar
-    | el2 relOps el2                   # exprRelational  // foo > bar
-    | el2 (EQ | EQUAL | EQEQ | IS) el2 # exprEqual       // foo == bar
-    | el2 ELVIS el2                    # exprElvis       // Elvis operator
-    | el2 CASTAS (type | el2)          # exprCastAs      // CastAs operator
-    | el2 DOES NOT CONTAIN el2         # exprNotContains // foo DOES NOT CONTAIN bar
-    | el2 (AND | AMPAMP) el2           # exprAnd         // foo AND bar
-    | el2 (OR | PIPEPIPE) el2          # exprOr          // foo OR bar
+    | el2_2 binOps el2_2                   # exprBinary      // foo eqv bar
+    | el2_2 relOps el2_2                   # exprRelational  // foo > bar
+    | el2_2 (EQ | EQUAL | EQEQ | IS) el2_2 # exprEqual       // foo == bar
+    | el2_2 ELVIS el2_2                    # exprElvis       // Elvis operator
+    | el2_2 CASTAS (type | el2_2)          # exprCastAs      // CastAs operator
+    | el2_2 DOES NOT CONTAIN el2_2         # exprNotContains // foo DOES NOT CONTAIN bar
+    | el2_2 (AND | AMPAMP) el2_2           # exprAnd         // foo AND bar
+    | el2_2 (OR | PIPEPIPE) el2_2          # exprOr          // foo OR bar
 
-    // el2 elements that have no operators so will be selected in order other than LL(*) solving
-    | ICHAR el2 ICHAR       # exprOutString    // #el2# not within a string literal
+    // el2_2 elements that have no operators so will be selected in order other than LL(*) solving
+    | ICHAR el2_2 ICHAR       # exprOutString    // #el2_2# not within a string literal
     | literals              # exprLiterals     // "bar", [1,2,3], {foo:bar}
     | arrayLiteral          # exprArrayLiteral // [1,2,3]
     | COLONCOLON identifier # exprBIF          // Static BIF functional reference ::uCase
 
-    // Evaluate assign here so that we can assign the result of an el2 to a variable
-    | el2 op = (
+    // Evaluate assign here so that we can assign the result of an el2_2 to a variable
+    | el2_2 op = (
         EQUALSIGN
         | PLUSEQUAL
         | MINUSEQUAL
@@ -515,10 +521,16 @@ el2
 
     // Ternary operations are right associative, which means that if they are nested,
     // the rightmost operation is evaluated first.
-    | <assoc = right> el2 QM expression COLON expression               # exprTernary    // foo ? bar : baz
+    | <assoc = right> el2_2 QM expression COLON expression               # exprTernary    // foo ? bar : baz
     | atoms                                                            # exprAtoms      // foo, 42, true, false, null, [1,2,3], {foo:bar}
     | { isAssignmentModifier(_input) }? assignmentModifier+ expression # exprVarDecl    // var foo = bar or final foo = bar
     | identifier                                                       # exprIdentifier // foo
+    //
+    // pipe placeholder
+    // tried to use '%' but that conflicts w/ `ident % ident` primarily in `{return,assert} %`,
+    // which seemed to parse as `<ident> % <missing>`
+    //
+    | AT                                                               # exprPipePlaceholder
     ;
 
 // Use this instead of redoing it as arrayValues, arguments etc.
@@ -624,7 +636,7 @@ template_attributeName: ATTRIBUTE_NAME
     ;
 
 // foo or.... "foo" or... 'foo' or... "#foo#" or... #foo#
-template_attributeValue: template_unquotedValue | ICHAR el2 ICHAR | stringLiteral
+template_attributeValue: template_unquotedValue | ICHAR el2_2 ICHAR | stringLiteral
     ;
 
 // foo

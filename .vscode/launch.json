@@ -175,6 +175,13 @@
 			"args": [
 				"module:test"
 			]
+		},
+		{
+			"type": "java",
+			"name": "attach",
+			"request": "attach",
+			"hostName": "localhost",
+			"port": 5005,
 		}
 	],
 	"inputs": [

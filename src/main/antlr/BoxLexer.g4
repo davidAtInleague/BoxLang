@@ -326,6 +326,8 @@ BANG : '!';
 OR       : 'OR';
 PIPEPIPE : '||';
 
+PIPEOP : '|>';
+
 AMPERSAND   : '&';
 ARROW       : '->';
 AT          : '@';

@@ -39,6 +39,20 @@ import ortus.boxlang.runtime.types.exceptions.ScopeNotFoundException;
 public class ClosureBoxContext extends FunctionBoxContext {
 
 	/**
+	 * Will be initialized from the captured pipe placeholder (if one exists)
+	 * in the Closure object we initialize from.
+	 */
+	private PipePlaceholder currentPipePlaceholder = null;
+
+	public PipePlaceholder getCurrentPipePlaceholder() {
+		return this.currentPipePlaceholder;
+	}
+
+	public void setCurrentPipePlaceholder( PipePlaceholder v ) {
+		this.currentPipePlaceholder = v;
+	}
+
+	/**
 	 * Creates a new execution context with a bounded function instance and parent context
 	 *
 	 * @param parent   The parent context
@@ -72,6 +86,8 @@ public class ClosureBoxContext extends FunctionBoxContext {
 		if ( parent == null ) {
 			throw new BoxRuntimeException( "Parent context cannot be null for ClosureBoxContext" );
 		}
+
+		this.setCurrentPipePlaceholder( function.getCapturedPipePlaceholder() );
 	}
 
 	/**
@@ -87,6 +103,8 @@ public class ClosureBoxContext extends FunctionBoxContext {
 		if ( parent == null ) {
 			throw new BoxRuntimeException( "Parent context cannot be null for ClosureBoxContext" );
 		}
+
+		this.setCurrentPipePlaceholder( function.getCapturedPipePlaceholder() );
 	}
 
 	/**
@@ -102,6 +120,8 @@ public class ClosureBoxContext extends FunctionBoxContext {
 		if ( parent == null ) {
 			throw new BoxRuntimeException( "Parent context cannot be null for ClosureBoxContext" );
 		}
+
+		this.setCurrentPipePlaceholder( function.getCapturedPipePlaceholder() );
 	}
 
 	@Override

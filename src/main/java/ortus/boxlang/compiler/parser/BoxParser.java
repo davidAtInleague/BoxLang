@@ -62,6 +62,7 @@ import ortus.boxlang.compiler.ast.expression.BoxMethodInvocation;
 import ortus.boxlang.compiler.ast.expression.BoxNew;
 import ortus.boxlang.compiler.ast.expression.BoxNull;
 import ortus.boxlang.compiler.ast.expression.BoxParenthesis;
+import ortus.boxlang.compiler.ast.expression.BoxPipePlaceholder;
 import ortus.boxlang.compiler.ast.expression.BoxScope;
 import ortus.boxlang.compiler.ast.expression.BoxStaticAccess;
 import ortus.boxlang.compiler.ast.expression.BoxStaticMethodInvocation;
@@ -1103,8 +1104,8 @@ public class BoxParser extends AbstractParser {
 		}
 		if ( node.stringLiteral() != null ) {
 			return expressionVisitor.visit( node.stringLiteral() );
-		} else if ( node.el2() != null ) {
-			return expressionVisitor.visit( node.el2() );
+		} else if ( node.el2_2() != null ) {
+			return expressionVisitor.visit( node.el2_2() );
 		} else {
 			throw new BoxRuntimeException( "Unexpected attribute value type " + node.getText() );
 		}
@@ -1508,6 +1509,8 @@ public class BoxParser extends AbstractParser {
 			}
 			case BoxFQN ignored -> {
 			}
+			case BoxPipePlaceholder ignored -> {
+			}
 			default -> errorListener.semanticError( left.getDescription() + " is not a valid construct for " + ( isStatic ? "static" : "dot" ) + " access",
 			    left.getPosition() );
 		}
@@ -1558,6 +1561,8 @@ public class BoxParser extends AbstractParser {
 			case BoxStaticAccess ignored -> {
 			}
 			case BoxStaticMethodInvocation ignored -> {
+			}
+			case BoxPipePlaceholder ignored -> {
 			}
 			default -> errorListener.semanticError( object.getDescription() + " is not a valid construct for array access ", getPosition( ctx ) );
 		}

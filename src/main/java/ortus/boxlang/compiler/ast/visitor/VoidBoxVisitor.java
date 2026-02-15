@@ -48,6 +48,8 @@ import ortus.boxlang.compiler.ast.expression.BoxNegateOperation;
 import ortus.boxlang.compiler.ast.expression.BoxNew;
 import ortus.boxlang.compiler.ast.expression.BoxNull;
 import ortus.boxlang.compiler.ast.expression.BoxParenthesis;
+import ortus.boxlang.compiler.ast.expression.BoxPipeExpr;
+import ortus.boxlang.compiler.ast.expression.BoxPipePlaceholder;
 import ortus.boxlang.compiler.ast.expression.BoxScope;
 import ortus.boxlang.compiler.ast.expression.BoxStaticAccess;
 import ortus.boxlang.compiler.ast.expression.BoxStaticMethodInvocation;
@@ -265,6 +267,14 @@ public abstract class VoidBoxVisitor {
 	}
 
 	public void visit( BoxParenthesis node ) {
+		visitChildren( node );
+	}
+
+	public void visit( BoxPipeExpr node ) {
+		visitChildren( node );
+	}
+
+	public void visit( BoxPipePlaceholder node ) {
 		visitChildren( node );
 	}
 

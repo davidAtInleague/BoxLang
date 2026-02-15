@@ -53,6 +53,8 @@ import ortus.boxlang.compiler.ast.expression.BoxNegateOperation;
 import ortus.boxlang.compiler.ast.expression.BoxNew;
 import ortus.boxlang.compiler.ast.expression.BoxNull;
 import ortus.boxlang.compiler.ast.expression.BoxParenthesis;
+import ortus.boxlang.compiler.ast.expression.BoxPipeExpr;
+import ortus.boxlang.compiler.ast.expression.BoxPipePlaceholder;
 import ortus.boxlang.compiler.ast.expression.BoxScope;
 import ortus.boxlang.compiler.ast.expression.BoxStaticAccess;
 import ortus.boxlang.compiler.ast.expression.BoxStaticMethodInvocation;
@@ -522,6 +524,14 @@ public abstract class ReplacingBoxVisitor {
 		if ( newExpr != expression ) {
 			node.setExpression( ( BoxExpression ) newExpr );
 		}
+		return node;
+	}
+
+	public BoxNode visit( BoxPipeExpr node ) {
+		throw new RuntimeException( "not implemented" );
+	}
+
+	public BoxNode visit( BoxPipePlaceholder node ) {
 		return node;
 	}
 

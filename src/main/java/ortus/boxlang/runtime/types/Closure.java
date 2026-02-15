@@ -25,6 +25,7 @@ import ortus.boxlang.compiler.parser.BoxSourceType;
 import ortus.boxlang.runtime.context.FunctionBoxContext;
 import ortus.boxlang.runtime.context.IBoxContext;
 import ortus.boxlang.runtime.loader.ImportDefinition;
+import ortus.boxlang.runtime.context.IBoxContext.PipePlaceholder;
 import ortus.boxlang.runtime.runnables.IClassRunnable;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.util.ResolvedFilePath;
@@ -34,19 +35,21 @@ import ortus.boxlang.runtime.util.ResolvedFilePath;
  */
 public class Closure extends CompiledFunction {
 
-	public static final Key		defaultName	= Key.of( "Closure" );
+	public static final Key			defaultName	= Key.of( "Closure" );
 
 	/**
 	 * The context in which this closure was declared.
 	 */
-	private IBoxContext			declaringContext;
+	private IBoxContext				declaringContext;
+
+	private final PipePlaceholder	capturedPipePlaceholder;
 
 	/**
 	 * The original closure definition
 	 * 
 	 * @param closureDefinition The original closure definition
 	 */
-	public ClosureDefinition	closureDefinition;
+	public ClosureDefinition		closureDefinition;
 
 	/**
 	 * Simple constructor for subclasses that override all getters.
@@ -57,8 +60,9 @@ public class Closure extends CompiledFunction {
 	public Closure( IBoxContext declaringContext ) {
 		super();
 		Objects.requireNonNull( declaringContext, "A Closure's declaring context cannot be null." );
-		this.declaringContext	= declaringContext;
-		this.closureDefinition	= null;
+		this.declaringContext			= declaringContext;
+		this.closureDefinition			= null;
+		this.capturedPipePlaceholder	= declaringContext.getCurrentPipePlaceholder();
 	}
 
 	/**
@@ -71,8 +75,9 @@ public class Closure extends CompiledFunction {
 	public Closure( IBoxContext declaringContext, ClosureDefinition originalClosure ) {
 		super();
 		Objects.requireNonNull( declaringContext, "A Closure's declaring context cannot be null." );
-		this.declaringContext	= declaringContext;
-		this.closureDefinition	= originalClosure;
+		this.declaringContext			= declaringContext;
+		this.closureDefinition			= originalClosure;
+		this.capturedPipePlaceholder	= declaringContext.getCurrentPipePlaceholder();
 	}
 
 	/**
@@ -236,4 +241,7 @@ public class Closure extends CompiledFunction {
 		return this.closureDefinition.getEnclosingClass();
 	}
 
+	public PipePlaceholder getCapturedPipePlaceholder() {
+		return this.capturedPipePlaceholder;
+	}
 }

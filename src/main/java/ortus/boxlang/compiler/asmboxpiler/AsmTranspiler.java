@@ -50,6 +50,8 @@ import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxMethodInvoca
 import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxNewTransformer;
 import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxNullTransformer;
 import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxParenthesisTransformer;
+import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxPipeExprTransformer;
+import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxPipePlaceholderTransformer;
 import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxReturnTransformer;
 import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxScopeTransformer;
 import ortus.boxlang.compiler.asmboxpiler.transformer.expression.BoxStatementBlockTransformer;
@@ -110,6 +112,8 @@ import ortus.boxlang.compiler.ast.expression.BoxMethodInvocation;
 import ortus.boxlang.compiler.ast.expression.BoxNew;
 import ortus.boxlang.compiler.ast.expression.BoxNull;
 import ortus.boxlang.compiler.ast.expression.BoxParenthesis;
+import ortus.boxlang.compiler.ast.expression.BoxPipeExpr;
+import ortus.boxlang.compiler.ast.expression.BoxPipePlaceholder;
 import ortus.boxlang.compiler.ast.expression.BoxScope;
 import ortus.boxlang.compiler.ast.expression.BoxStaticAccess;
 import ortus.boxlang.compiler.ast.expression.BoxStaticMethodInvocation;
@@ -435,6 +439,8 @@ public class AsmTranspiler extends Transpiler {
 		registry.put( BoxParam.class, new BoxParamTransformer( this ) );
 		registry.put( BoxFunctionalBIFAccess.class, new BoxFunctionalBIFAccessTransformer( this ) );
 		registry.put( BoxFunctionalMemberAccess.class, new BoxFunctionalMemberAccessTransformer( this ) );
+		registry.put( BoxPipeExpr.class, new BoxPipeExprTransformer( this ) );
+		registry.put( BoxPipePlaceholder.class, new BoxPipePlaceholderTransformer( this ) );
 	}
 
 	@Override

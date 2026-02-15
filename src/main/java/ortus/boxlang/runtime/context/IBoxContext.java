@@ -892,4 +892,24 @@ public interface IBoxContext extends IBoxAttachable, Serializable {
 	 */
 	public int unregisterDependentThread();
 
+	/**
+	 * May contain null for "null is being piped through a pipe expr",
+	 * for example in (the nonsensical but valid) `null |> %`
+	 */
+	record PipePlaceholder( Object value ) {
+	}
+
+	/**
+	 * @return null if there is no current evaluating pipeline expr
+	 */
+	default public PipePlaceholder getCurrentPipePlaceholder() {
+		return null;
+	}
+
+	/**
+	 * Not all contexts will need to have a "current pipe placeholder". We'll hear about the ones that do.
+	 */
+	default public void setCurrentPipePlaceholder( PipePlaceholder obj ) {
+		throw new RuntimeException( "Class '" + this.getClass().getName() + "' does not implement 'setCurrentPipePlaceholder'." );
+	}
 }

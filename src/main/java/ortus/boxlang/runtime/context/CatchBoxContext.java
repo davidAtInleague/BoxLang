@@ -38,8 +38,18 @@ public class CatchBoxContext extends ParentPassthroughBoxContext {
 	/**
 	 * The variables scope
 	 */
-	private IScope		variablesScope;
-	private Throwable	exception;
+	private IScope			variablesScope;
+	private Throwable		exception;
+
+	private PipePlaceholder	currentPipePlaceholder	= null;
+
+	public PipePlaceholder getCurrentPipePlaceholder() {
+		return this.currentPipePlaceholder;
+	}
+
+	public void setCurrentPipePlaceholder( PipePlaceholder v ) {
+		this.currentPipePlaceholder = v;
+	}
 
 	/**
 	 * --------------------------------------------------------------------------
@@ -59,11 +69,12 @@ public class CatchBoxContext extends ParentPassthroughBoxContext {
 		if ( parent == null ) {
 			throw new BoxRuntimeException( "Parent context cannot be null for CatchBoxContext" );
 		}
-		this.exception		= exception;
-		this.variablesScope	= new ScopeWrapper(
+		this.exception				= exception;
+		this.variablesScope			= new ScopeWrapper(
 		    parent.getScopeNearby( VariablesScope.name ),
 		    Map.of( exceptionKey, exception )
 		);
+		this.currentPipePlaceholder	= parent.getCurrentPipePlaceholder();
 	}
 
 	/**
