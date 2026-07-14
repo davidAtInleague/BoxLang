@@ -384,4 +384,29 @@ public class PipeExprTest {
 			assertThat( result.isCorrect() ).isTrue();
 		}
 	}
+
+	@Test
+	public void captures() {
+		instance.executeSource(
+		    """
+		    	f = null;
+
+		    	42
+					|> (() => {
+						f = () => @
+					})()
+					|> 43
+					|> 44
+					|> 45;
+
+				a = f()
+				b = f()
+		    """,
+		    context,
+		    BoxSourceType.BOXSCRIPT
+		);
+
+		assertThat( variables.get( "a" ) ).isEqualTo( 42 );
+		assertThat( variables.get( "b" ) ).isEqualTo( 42 );
+	}
 }
