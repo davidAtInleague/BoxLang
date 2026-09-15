@@ -2,11 +2,14 @@ package ortus.boxlang.runtime.bifs.global.async;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import ortus.boxlang.compiler.parser.BoxSourceType;
 import ortus.boxlang.runtime.BoxRuntime;
@@ -95,4 +98,35 @@ public class ThreadJoinTest {
 		assertThat( variables.getAsStruct( result ).get( Key.status ) ).isEqualTo( "COMPLETED" );
 	}
 
+	/**
+	 * 
+	 * sometimes this hangs, sometimes it passes
+	 * 
+	 */
+	@DisplayName( "joining thousands of uniquely named virtual threads does not hang" )
+	@Test
+	@Timeout( value = 30, unit = TimeUnit.SECONDS )
+	public void testJoinThousandsOfVirtualThreads() {
+		// @formatter:off
+		instance.executeSource(
+		    """
+				n = 5000;
+				completed = createObject( "java", "java.util.concurrent.atomic.AtomicInteger" ).init( 0 );
+				latch = createObject( "java", "java.util.concurrent.CountDownLatch" ).init( 1 );
+				names = [];
+				for ( i = 1; i <= n; i++ ) {
+					names.append( "burst_#i#" );
+					thread name="burst_#i#" virtual="true" {
+						latch.await();
+						completed.incrementAndGet();
+					}
+				}
+				latch.countDown();
+				thread action="join" name="#names.toList( "," )#";
+				result = completed.get();
+		    """,
+		    context, BoxSourceType.CFSCRIPT );
+		// @formatter:on
+		assertThat( variables.get( result ) ).isEqualTo( 5000 );
+	}
 }
