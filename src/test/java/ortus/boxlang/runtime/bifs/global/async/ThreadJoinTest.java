@@ -129,4 +129,49 @@ public class ThreadJoinTest {
 		// @formatter:on
 		assertThat( variables.get( result ) ).isEqualTo( 5000 );
 	}
+
+	/**
+	 * 
+	 * sometimes this hangs, sometimes it passes
+	 * 
+	 */
+	@DisplayName( "" )
+	@Test
+	@Timeout( value = 30, unit = TimeUnit.SECONDS )
+	public void testThousandsOfVirtualThreads() {
+		// @formatter:off
+		instance.executeSource(
+		    """
+				n = 5000;
+				completed = createObject( "java", "java.util.concurrent.atomic.AtomicInteger" ).init( 0 );
+				latch = createObject( "java", "java.util.concurrent.CountDownLatch" ).init( 1 );
+				names = [];
+
+				ids = []
+				for (i = 1; i <= n; i++) {
+					ids.append(i)
+				}
+
+				futures = ids.map((i) => {
+					var future = createObject("java", "java.util.concurrent.CompletableFuture").init();
+					var doIt = () => {
+						future.complete(i);
+					}
+					names.append( "burst_#i#" );
+					thread name="burst_#i#" virtual="true" doit=doit {
+						latch.await();
+						doit()
+					}
+					return future;
+				})
+
+				latch.countDown();
+				result = futures.map((v) => v.get())
+				expected = ids;
+		    """,
+		    context, BoxSourceType.CFSCRIPT );
+		// @formatter:on
+
+		assertThat( variables.get( result ) ).isEqualTo( variables.get( "expected" ) );
+	}
 }
